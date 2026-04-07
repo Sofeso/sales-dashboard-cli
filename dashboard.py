@@ -138,6 +138,7 @@ def export_report(df, output_file):
 
 
 def run_dashboard(data_folder="sample_data", output_file="output/sales_report.csv"):
+    export_json(df)
     df = load_data(data_folder)
     if df is None:
         return
@@ -151,6 +152,18 @@ def run_dashboard(data_folder="sample_data", output_file="output/sales_report.cs
     export_report(df, output_file)
     print("\n" + "=" * 60)
 
+def export_json(df, output_file="output/sales_summary.json"):
+    summary = {
+        "total_revenue": df["revenue"].sum(),
+        "total_orders": len(df),
+        "total_units": int(df["quantity"].sum()),
+        "best_month": df.groupby("month")["revenue"].sum().idxmax(),
+    }
+    import json, os
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    with open(output_file, "w") as f:
+        json.dump(summary, f, indent=2)
+    print(f"\n  📁 JSON summary exported to: {output_file}")
 
 if __name__ == "__main__":
     run_dashboard()
